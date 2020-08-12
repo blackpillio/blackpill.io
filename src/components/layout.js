@@ -30,9 +30,7 @@ function Layout(props) {
           {/* <Link href="/about" passHref>
             <NavLink>About Us</NavLink>
           </Link> */}
-          <Link href="/about" passHref>
-            <NavLink>Discord</NavLink>
-          </Link>
+          <NavLink href={props.siteMetadata.discordLink}>Discord</NavLink>
           <div sx={{ display: 'flex', justifyContent: 'flex-end', flex: '3 1 auto', p: 3 }}>
             <IconButton sx={{ cursor: 'pointer' }} aria-label="Toggle dark mode">
               <svg

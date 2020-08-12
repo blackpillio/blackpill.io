@@ -36,12 +36,12 @@ Dreaming as the summer die.”
     `,
 ];
 
-const IndexRoute = ({ data }) => {
+const IndexRoute = ({ data, siteMetadata }) => {
   const { generalSettings } = data;
   const { title, description } = generalSettings;
 
   return (
-    <Layout>
+    <Layout siteMetadata={siteMetadata}>
       <Head>
         <title>Blackpill.io</title>
         <meta name="description" content="Go now." key="description" />
@@ -49,7 +49,7 @@ const IndexRoute = ({ data }) => {
       </Head>
       <Container>
         {quotes.map(quote => (
-          <p>{quote}</p>
+          <p key={quote}>{quote}</p>
         ))}
       </Container>
     </Layout>
