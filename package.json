@@ -8,14 +8,17 @@
     "build:export": "next build && next export",
     "start": "next start",
     "export": "next export",
-    "format": "prettier --write '{,!(node_modules|assets|.next)/**/}*.js*'"
+    "format": "prettier --write '{,!(node_modules|assets|.next)/**/}*.js*'",
+    "lint": "eslint --ext .js,.jsx --ignore-pattern public ."
   },
   "dependencies": {
+    "@primer/octicons-react": "^10.0.0",
     "apollo-fetch": "^0.7.0",
     "graphql": "^15.3.0",
-    "graphql-request": "^2.0.0",
+    "graphql-request": "3.0.0",
     "graphql-tag": "^2.11.0",
     "html-react-parser": "^0.13.0",
+    "lodash": "^4.17.19",
     "moment": "^2.27.0",
     "next": "9.5.1",
     "node-fetch": "^2.6.0",
@@ -32,6 +35,19 @@
     "eslint-plugin-jsx-a11y": "^6.3.0",
     "eslint-plugin-react": "^7.20.0",
     "eslint-plugin-react-hooks": "4.0.0",
+    "husky": "^4.2.5",
+    "lint-staged": "^10.2.11",
     "prettier": "^2.0.5"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "./src/*.{js,jsx,ts,tsx}": [
+      "npx prettier --write",
+      "eslint src/*.js --fix-dry-run"
+    ]
   }
 }

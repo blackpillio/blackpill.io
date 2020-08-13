@@ -1,45 +1,37 @@
-import React from 'react';
+/** @jsx jsx */
 import Head from 'next/head';
-import parse from 'html-react-parser';
-import { Container } from 'theme-ui';
-
+import _ from 'lodash';
+import { jsx, Container, Input, Heading, IconButton, Flex, Box } from 'theme-ui';
+import { SearchIcon } from '@primer/octicons-react';
 import { createApolloFetch } from 'apollo-fetch';
 
 import Layout from '../components/layout';
 import { getSiteMetadata } from '../lib/site';
 
-const quotes = [
-  `“The sun was shining on the sea,
-Shining with all his might:
-He did his very best to make
-The billows smooth and bright
--- And this was odd, because it was
-The middle of the night.
-    `,
-  `The moon was shining sulkily,
-Because she thought the sun
-Had got no business to be there
-After the day was done
--- "It's very rude of him," she said,
-"To come and spoil the fun!"
-    `,
-  `The sea was wet as wet could be,
-The sands were dry as dry.
-You could not see a cloud, because
-No cloud was in the sky:
-No birds were flying overhead
--- There were no birds to fly.
-    `,
-  `In a Wonderland they lie
-Dreaming as the days go by,
-Dreaming as the summer die.”
-    `,
+const categories = [
+  '3-letter-agencies',
+  '9-11',
+  '13-bloodlines',
+  'big-ag',
+  'big-healthcare',
+  'big-oil',
+  'big-pharma',
+  'big-science',
+  'censorship',
+  'bush',
+  'jfk',
+  'clinton',
+  'china',
+  'deep state',
+  'nwo',
+  'panama-papers',
+  'elite',
+  'rothchilds',
+  '1984',
+  'military-industrial-complex',
 ];
 
-const IndexRoute = ({ data, siteMetadata }) => {
-  const { generalSettings } = data;
-  const { title, description } = generalSettings;
-
+const IndexRoute = ({ siteMetadata }) => {
   return (
     <Layout siteMetadata={siteMetadata}>
       <Head>
@@ -48,9 +40,26 @@ const IndexRoute = ({ data, siteMetadata }) => {
         <html lang="en" key="lang" />
       </Head>
       <Container>
-        {quotes.map(quote => (
-          <p key={quote}>{quote}</p>
-        ))}
+        <Heading sx={{ margin: '1rem' }}>Search</Heading>
+        <Flex>
+          <Input placeholder={_.shuffle(categories).join(', ')} />
+          <Box
+            p={1}
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+            }}
+          >
+            <IconButton
+              aria-label="Toggle dark mode"
+              onClick={e => {
+                console.log(e);
+              }}
+            >
+              <SearchIcon size={24} />
+            </IconButton>
+          </Box>
+        </Flex>
       </Container>
     </Layout>
   );

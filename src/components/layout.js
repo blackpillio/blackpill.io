@@ -1,8 +1,8 @@
 /** @jsx jsx */
-import { jsx, useColorMode, IconButton, Flex } from 'theme-ui';
+import { jsx, useColorMode, IconButton, Flex, Container } from 'theme-ui';
 import Link from 'next/link';
 
-import NavLink from '../components/navlink';
+import NavLink from './navlink';
 
 function Layout(props) {
   const [colorMode, setColorMode] = useColorMode();
@@ -32,16 +32,19 @@ function Layout(props) {
           </Link> */}
           <NavLink href={props.siteMetadata.discordLink}>Discord</NavLink>
           <div sx={{ display: 'flex', justifyContent: 'flex-end', flex: '3 1 auto', p: 3 }}>
-            <IconButton sx={{ cursor: 'pointer' }} aria-label="Toggle dark mode">
+            <IconButton
+              sx={{ cursor: 'pointer' }}
+              aria-label="Toggle dark mode"
+              onClick={() => {
+                setColorMode(colorMode === 'default' ? 'dark' : 'default');
+              }}
+            >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 24 24"
                 width="24"
                 height="24"
                 fill="currentcolor"
-                onClick={() => {
-                  setColorMode(colorMode === 'default' ? 'dark' : 'default');
-                }}
               >
                 <circle r={11} cx={12} cy={12} fill="none" stroke="currentcolor" strokeWidth={2} />
               </svg>
@@ -68,12 +71,12 @@ function Layout(props) {
           <div className="corner-ribbon bottom-right sticky green shadow">Beta</div>
         </div>
       </main>
-      <footer
-        sx={{
-          width: '100%',
-          variant: 'layout.footer',
-        }}
-      />
+      <footer sx={{}}>
+        <Container>
+          This site is currently under development. Things may not work as expected. Things will
+          change.
+        </Container>
+      </footer>
     </div>
   );
 }
