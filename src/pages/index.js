@@ -52,6 +52,7 @@ const IndexRoute = ({ siteMetadata }) => {
           >
             <IconButton
               aria-label="Toggle dark mode"
+              sx={{ cursor: 'pointer' }}
               onClick={e => {
                 console.log(e);
               }}
