@@ -1,6 +1,7 @@
 /** @jsx jsx */
 import { jsx } from 'theme-ui';
 import Layout from '../components/layout';
+import { getSiteMetadata } from '../lib/site';
 
 const quotes = [
   `“The sun was shining on the sea,
@@ -30,9 +31,9 @@ Dreaming as the summer die.”
     `,
 ];
 
-function about() {
+function about({ siteMetadata }) {
   return (
-    <Layout>
+    <Layout siteMetadata={siteMetadata}>
       {quotes.map(quote => (
         <p>{quote}</p>
       ))}
@@ -40,4 +41,12 @@ function about() {
   );
 }
 
+export const getStaticProps = async () => {
+  const siteMetadata = getSiteMetadata();
+  return {
+    props: {
+      siteMetadata,
+    },
+  };
+};
 export default about;
