@@ -85,7 +85,7 @@ const IndexRoute = ({ siteMetadata, placeholder }) => {
     });
   };
   const goToPost = uri => {
-    router.push(uri);
+    router.push(_.kebabCase(uri));
   };
 
   const onSuggestionsFetchRequested = ({ value: val }) => {
