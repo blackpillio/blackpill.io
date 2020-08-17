@@ -38,6 +38,8 @@ body {
   -webkit-transform: rotate(-45deg);
 }
 
+/* react autosuggest */
+
 .react-autosuggest__container {
   position: relative;
 }

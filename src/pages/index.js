@@ -1,15 +1,18 @@
 /** @jsx jsx */
-import { jsx, Container, Input, Heading, IconButton, Flex, Box } from 'theme-ui';
+import { jsx, useThemeUI, Container, Input, Heading, IconButton, Flex, Box } from 'theme-ui';
 import { useState } from 'react';
 import { request, gql } from 'graphql-request';
 import AutoSuggest from 'react-autosuggest';
 
 import Head from 'next/head';
-import Link from 'next/link';
+import { useRouter } from 'next/router';
 
 import _ from 'lodash';
 import { SearchIcon } from '@primer/octicons-react';
 import { createApolloFetch } from 'apollo-fetch';
+
+import lightReactAutoSuggestTheme from '../styles/react-autosuggest-light.module.css';
+import darkReactAutoSuggestTheme from '../styles/react-autosuggest-dark.module.css';
 
 import Layout from '../components/layout';
 import { getSiteMetadata } from '../lib/site';
@@ -58,9 +61,7 @@ function getSuggestionValue(suggestion) {
 function renderSuggestion(suggestion) {
   return (
     <div>
-      <Link href={suggestion.uri}>
-        <a>{suggestion.title}</a>
-      </Link>
+      <a>{suggestion.title}</a>
     </div>
   );
 }
@@ -68,6 +69,9 @@ function renderSuggestion(suggestion) {
 const IndexRoute = ({ siteMetadata, placeholder }) => {
   const { WPGraphQL } = siteMetadata;
 
+  const { colorMode } = useThemeUI();
+
+  const router = useRouter();
   const [value, setValue] = useState('');
   const [suggestions, setSuggestions] = useState([]);
 
@@ -80,9 +84,17 @@ const IndexRoute = ({ siteMetadata, placeholder }) => {
       setSuggestions(data.posts.edges.map(({ node }) => node));
     });
   };
+  const goToPost = uri => {
+    router.push(uri);
+  };
 
   const onSuggestionsFetchRequested = ({ value: val }) => {
     loadSuggestions(val);
+  };
+
+  const onSuggestionSelected = (event, { suggestion }) => {
+    setValue(suggestion.title);
+    router.push(suggestion.uri);
   };
 
   const onSuggestionsClearRequested = () => setSuggestions([]);
@@ -105,31 +117,35 @@ const IndexRoute = ({ siteMetadata, placeholder }) => {
       </Head>
       <Container>
         <Heading sx={{ margin: '1rem' }}>Search</Heading>
-        <Flex>
+        <Flex sx={{ alignItems: 'center' }}>
           <div sx={{ flex: '1 1 auto' }}>
             <AutoSuggest
               suggestions={suggestions}
               onSuggestionsFetchRequested={onSuggestionsFetchRequested}
               onSuggestionsClearRequested={onSuggestionsClearRequested}
+              onSuggestionSelected={onSuggestionSelected}
               getSuggestionValue={getSuggestionValue}
               renderSuggestion={renderSuggestion}
               shouldRenderSuggestions={shouldRenderSuggestions}
               renderInputComponent={props => <Input {...props} />}
               inputProps={inputProps}
+              theme={
+                colorMode === 'default' ? lightReactAutoSuggestTheme : darkReactAutoSuggestTheme
+              }
+              highlightFirstSuggestion
             />
           </div>
           <Box
             p={1}
             sx={{
               display: 'flex',
-              paddingTop: '.35rem',
             }}
           >
             <IconButton
               aria-label="Toggle dark mode"
               sx={{ cursor: 'pointer' }}
-              onClick={e => {
-                console.log(e);
+              onClick={() => {
+                goToPost(value);
               }}
             >
               <SearchIcon size={24} />

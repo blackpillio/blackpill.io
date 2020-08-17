@@ -1,12 +1,46 @@
-import { request } from 'graphql-request';
+import { gql, request } from 'graphql-request';
 
 import { getSiteMetadata } from './site';
+import { cachePostInfo } from '../utils/cache';
 
-const getPostById = async id => {
-  const wpgraphql = getSiteMetadata().WPGraphQL;
-  const query = /* GraphQL */ `
-    query($id: ID!) {
-      post(id: $id) {
+const GET_POSTS_AFTER = gql`
+  query GET_POSTS($first: Int, $after: String) {
+    posts(first: $first, after: $after) {
+      pageInfo {
+        endCursor
+        hasNextPage
+      }
+      nodes {
+        id
+        uri
+      }
+    }
+  }
+`;
+
+const GET_POSTS = gql`
+  query GET_POSTS($first: Int) {
+    posts(first: $first) {
+      pageInfo {
+        endCursor
+        hasNextPage
+      }
+      nodes {
+        id
+        uri
+        postId
+        title
+      }
+    }
+  }
+`;
+
+const POST_BY_URI = gql`
+  query($uri: String!) {
+    nodeByUri(uri: $uri) {
+      uri
+      id
+      ... on Post {
         id
         slug
         title
@@ -20,50 +54,57 @@ const getPostById = async id => {
         }
       }
     }
-  `;
-
-  const myData = await request(wpgraphql, query, { id });
-  return myData.post;
-};
+  }
+`;
 
 export const getPostByUri = async uri => {
   const wpgraphql = getSiteMetadata().WPGraphQL;
-  const query = /* GraphQL */ `
-    query {
-      posts {
-        edges {
-          node {
-            id
-            uri
-          }
-        }
-      }
-    }
-  `;
 
-  const uris = await request(wpgraphql, query);
-  const joinedUri = `/${uri.join('/')}/`;
-  const post = uris.posts.edges.find(({ node }) => node.uri === joinedUri);
-  const id = post.node.id;
-  return getPostById(id);
+  const searchUri = uri.join('/');
+  const { nodeByUri } = await request(wpgraphql, POST_BY_URI, { uri: searchUri });
+  return nodeByUri;
 };
 
 export const getPostPaths = async () => {
   const wpgraphql = getSiteMetadata().WPGraphQL;
 
-  const query = /* GraphQL */ `
-    query {
-      posts {
-        edges {
-          node {
-            id
-            uri
-          }
-        }
-      }
-    }
-  `;
+  const firstData = await request(wpgraphql, GET_POSTS, { first: 10 });
 
-  const data = await request(wpgraphql, query);
-  return data.posts.edges.map(edge => edge.node.uri);
+  const {
+    posts: {
+      nodes: firstNodes,
+      pageInfo: { hasNextPage: firstHasNextPage, endCursor: firstEndCursor },
+    },
+  } = firstData;
+
+  const allNodes = firstNodes;
+
+  const fetchPosts = async endCursor => {
+    const data = await request(wpgraphql, GET_POSTS_AFTER, {
+      first: 10,
+      after: endCursor,
+    });
+
+    const {
+      posts: {
+        nodes,
+        pageInfo: { hasNextPage, endCursor: nextEndCursor },
+      },
+    } = data;
+
+    nodes.forEach(ele => allNodes.push(ele));
+
+    if (hasNextPage) {
+      return fetchPosts(nextEndCursor);
+    }
+    return allNodes;
+  };
+
+  let finalNodes = allNodes;
+  if (firstHasNextPage) {
+    finalNodes = await fetchPosts(firstEndCursor);
+  }
+
+  cachePostInfo(finalNodes);
+  return finalNodes.map(node => node.uri);
 };

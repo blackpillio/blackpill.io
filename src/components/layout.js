@@ -1,5 +1,5 @@
 /** @jsx jsx */
-import { jsx, useColorMode, IconButton, Flex, Container, NavLink } from 'theme-ui';
+import { jsx, useColorMode, IconButton, Flex, Box, NavLink } from 'theme-ui';
 import Link from 'next/link';
 
 function Layout(props) {
@@ -72,10 +72,11 @@ function Layout(props) {
         </div>
       </main>
       <footer sx={{}}>
-        <Container>
+        <Box mt={5}>
           This site is currently under development. Things may not work as expected. Things will
-          change.
-        </Container>
+          change. This site is currently under development. Things may not work as expected. Things
+          will change.
+        </Box>
       </footer>
     </div>
   );
