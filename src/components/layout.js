@@ -1,8 +1,6 @@
 /** @jsx jsx */
-import { jsx, useColorMode, IconButton, Flex, Container } from 'theme-ui';
+import { jsx, useColorMode, IconButton, Flex, Container, NavLink } from 'theme-ui';
 import Link from 'next/link';
-
-import NavLink from './navlink';
 
 function Layout(props) {
   const [colorMode, setColorMode] = useColorMode();
@@ -25,7 +23,9 @@ function Layout(props) {
       >
         <Flex as="nav" sx={{ flexWrap: 'wrap', alignItems: 'center' }}>
           <Link href="/" passHref>
-            <NavLink>Blackpill.io</NavLink>
+            <NavLink p={3} sx={{ flex: '0 1 auto', cursor: 'pointer' }}>
+              Blackpill.io
+            </NavLink>
           </Link>
           {/* <Link href="/about" passHref>
             <NavLink>About Us</NavLink>

@@ -1,12 +1,32 @@
 /** @jsx jsx */
-import Head from 'next/head';
-import _ from 'lodash';
 import { jsx, Container, Input, Heading, IconButton, Flex, Box } from 'theme-ui';
+import { useState } from 'react';
+import { request, gql } from 'graphql-request';
+import AutoSuggest from 'react-autosuggest';
+
+import Head from 'next/head';
+import Link from 'next/link';
+
+import _ from 'lodash';
 import { SearchIcon } from '@primer/octicons-react';
 import { createApolloFetch } from 'apollo-fetch';
 
 import Layout from '../components/layout';
 import { getSiteMetadata } from '../lib/site';
+
+const SEARCH_QUERY = gql`
+  query($search: String!) {
+    posts(where: { search: $search }) {
+      edges {
+        node {
+          id
+          title
+          uri
+        }
+      }
+    }
+  }
+`;
 
 const categories = [
   '3-letter-agencies',
@@ -31,23 +51,78 @@ const categories = [
   'military-industrial-complex',
 ];
 
-const IndexRoute = ({ siteMetadata }) => {
+function getSuggestionValue(suggestion) {
+  return suggestion;
+}
+
+function renderSuggestion(suggestion) {
+  return (
+    <div>
+      <Link href={suggestion.uri}>
+        <a>{suggestion.title}</a>
+      </Link>
+    </div>
+  );
+}
+
+const IndexRoute = ({ siteMetadata, placeholder }) => {
+  const { WPGraphQL } = siteMetadata;
+
+  const [value, setValue] = useState('');
+  const [suggestions, setSuggestions] = useState([]);
+
+  const [, setLoading] = useState(false);
+
+  const loadSuggestions = val => {
+    setLoading(true);
+    request(WPGraphQL, SEARCH_QUERY, { search: val }).then(data => {
+      setLoading(false);
+      setSuggestions(data.posts.edges.map(({ node }) => node));
+    });
+  };
+
+  const onSuggestionsFetchRequested = ({ value: val }) => {
+    loadSuggestions(val);
+  };
+
+  const onSuggestionsClearRequested = () => setSuggestions([]);
+
+  const shouldRenderSuggestions = val => val.length >= 3;
+
+  const inputProps = {
+    placeholder,
+    value,
+    onChange: (event, { newValue }) => {
+      setValue(newValue);
+    },
+  };
+
   return (
     <Layout siteMetadata={siteMetadata}>
       <Head>
         <title>Blackpill.io</title>
         <meta name="description" content="Go now." key="description" />
-        <html lang="en" key="lang" />
       </Head>
       <Container>
         <Heading sx={{ margin: '1rem' }}>Search</Heading>
         <Flex>
-          <Input placeholder={_.shuffle(categories).join(', ')} />
+          <div sx={{ flex: '1 1 auto' }}>
+            <AutoSuggest
+              suggestions={suggestions}
+              onSuggestionsFetchRequested={onSuggestionsFetchRequested}
+              onSuggestionsClearRequested={onSuggestionsClearRequested}
+              getSuggestionValue={getSuggestionValue}
+              renderSuggestion={renderSuggestion}
+              shouldRenderSuggestions={shouldRenderSuggestions}
+              renderInputComponent={props => <Input {...props} />}
+              inputProps={inputProps}
+            />
+          </div>
           <Box
             p={1}
             sx={{
               display: 'flex',
-              alignItems: 'center',
+              paddingTop: '.35rem',
             }}
           >
             <IconButton
@@ -88,10 +163,13 @@ export const getStaticProps = async () => {
   const fetch = createApolloFetch({ uri });
   const { data } = await fetch({ query });
 
+  const placeholder = _.shuffle(categories).join(', ');
+
   return {
     props: {
       data,
       siteMetadata,
+      placeholder,
     },
   };
 };
