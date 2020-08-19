@@ -65,6 +65,7 @@ const POPULAR_POSTS = gql`
           id
           title
           uri
+          date
         }
       }
     }
@@ -128,5 +129,7 @@ export const getPopularPosts = async () => {
 
   const { posts } = await request(wpgraphql, POPULAR_POSTS);
 
-  return posts.edges;
+  return posts.edges.sort((a, b) => {
+    return new Date(a.node.date) - new Date(b.node.date);
+  });
 };
