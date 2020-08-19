@@ -3,7 +3,7 @@ import { gql, request } from 'graphql-request';
 import { getSiteMetadata } from './site';
 import { cachePostInfo } from '../utils/cache';
 
-const GET_POSTS_AFTER = gql`
+const POSTS_AFTER = gql`
   query GET_POSTS($first: Int, $after: String) {
     posts(first: $first, after: $after) {
       pageInfo {
@@ -18,7 +18,7 @@ const GET_POSTS_AFTER = gql`
   }
 `;
 
-const GET_POSTS = gql`
+const POSTS = gql`
   query GET_POSTS($first: Int) {
     posts(first: $first) {
       pageInfo {
@@ -57,6 +57,20 @@ const POST_BY_URI = gql`
   }
 `;
 
+const POPULAR_POSTS = gql`
+  query {
+    posts(where: { categoryName: "Popular" }) {
+      edges {
+        node {
+          id
+          title
+          uri
+        }
+      }
+    }
+  }
+`;
+
 export const getPostByUri = async uri => {
   const wpgraphql = getSiteMetadata().WPGraphQL;
 
@@ -68,7 +82,7 @@ export const getPostByUri = async uri => {
 export const getPostPaths = async () => {
   const wpgraphql = getSiteMetadata().WPGraphQL;
 
-  const firstData = await request(wpgraphql, GET_POSTS, { first: 10 });
+  const firstData = await request(wpgraphql, POSTS, { first: 10 });
 
   const {
     posts: {
@@ -80,7 +94,7 @@ export const getPostPaths = async () => {
   const allNodes = firstNodes;
 
   const fetchPosts = async endCursor => {
-    const data = await request(wpgraphql, GET_POSTS_AFTER, {
+    const data = await request(wpgraphql, POSTS_AFTER, {
       first: 10,
       after: endCursor,
     });
@@ -107,4 +121,12 @@ export const getPostPaths = async () => {
 
   cachePostInfo(finalNodes);
   return finalNodes.map(node => node.uri);
+};
+
+export const getPopularPosts = async () => {
+  const wpgraphql = getSiteMetadata().WPGraphQL;
+
+  const { posts } = await request(wpgraphql, POPULAR_POSTS);
+
+  return posts.edges;
 };

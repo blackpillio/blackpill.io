@@ -86,6 +86,7 @@ export default {
     },
     a: {
       color: 'primary',
+      textDecoration: 'none',
     },
     pre: {
       fontFamily: 'monospace',

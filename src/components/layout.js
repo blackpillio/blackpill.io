@@ -74,8 +74,7 @@ function Layout(props) {
       <footer sx={{}}>
         <Box mt={5}>
           This site is currently under development. Things may not work as expected. Things will
-          change. This site is currently under development. Things may not work as expected. Things
-          will change.
+          change.
         </Box>
       </footer>
     </div>

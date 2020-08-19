@@ -1,10 +1,22 @@
 /** @jsx jsx */
-import { jsx, useThemeUI, Container, Input, Heading, IconButton, Flex, Box } from 'theme-ui';
+import {
+  jsx,
+  useThemeUI,
+  Container,
+  Input,
+  Heading,
+  IconButton,
+  Flex,
+  Box,
+  Link,
+  Divider,
+} from 'theme-ui';
 import { useState } from 'react';
 import { request, gql } from 'graphql-request';
 import AutoSuggest from 'react-autosuggest';
 
 import Head from 'next/head';
+import NLink from 'next/link';
 import { useRouter } from 'next/router';
 
 import _ from 'lodash';
@@ -16,6 +28,7 @@ import darkReactAutoSuggestTheme from '../styles/react-autosuggest-dark.module.c
 
 import Layout from '../components/layout';
 import { getSiteMetadata } from '../lib/site';
+import { getPopularPosts } from '../lib/post';
 
 const SEARCH_QUERY = gql`
   query($search: String!) {
@@ -66,7 +79,8 @@ function renderSuggestion(suggestion) {
   );
 }
 
-const IndexRoute = ({ siteMetadata, placeholder }) => {
+const IndexRoute = ({ siteMetadata, placeholder, popularPosts }) => {
+  console.log(popularPosts);
   const { WPGraphQL } = siteMetadata;
 
   const { colorMode } = useThemeUI();
@@ -108,6 +122,12 @@ const IndexRoute = ({ siteMetadata, placeholder }) => {
       setValue(newValue);
     },
   };
+
+  const twoPosts = popularPosts.slice(0, 2);
+  const rest = popularPosts.slice(3, popularPosts.length);
+
+  console.log(twoPosts);
+  console.log(rest);
 
   return (
     <Layout siteMetadata={siteMetadata}>
@@ -152,6 +172,53 @@ const IndexRoute = ({ siteMetadata, placeholder }) => {
             </IconButton>
           </Box>
         </Flex>
+        <Divider />
+        <Flex mb={3} sx={{ justifyContent: 'space-between' }}>
+          {twoPosts.length
+            ? twoPosts.map(({ node }) => (
+                <Box p={1}>
+                  <Box p={2}>
+                    <Heading>
+                      <Link href={node.uri}>
+                        <a>{node.title}</a>
+                      </Link>
+                    </Heading>
+                    <p>
+                      Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor
+                      incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis
+                      nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+                      Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore
+                      eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt
+                      in culpa qui officia deserunt mollit anim id est laborum.
+                    </p>
+                  </Box>
+                </Box>
+              ))
+            : null}
+        </Flex>
+        <Flex p={1} sx={{ flexDirection: 'column' }}>
+          {rest.length
+            ? rest.map(({ node }) => (
+                <Box sx={{ mb: '2rem' }}>
+                  <Heading>
+                    <NLink href={node.uri} passHref>
+                      <Link>
+                        <a>{node.title}</a>
+                      </Link>
+                    </NLink>
+                  </Heading>
+                  <p>
+                    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor
+                    incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis
+                    nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+                    Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu
+                    fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in
+                    culpa qui officia deserunt mollit anim id est laborum.
+                  </p>
+                </Box>
+              ))
+            : null}
+        </Flex>
       </Container>
     </Layout>
   );
@@ -181,9 +248,12 @@ export const getStaticProps = async () => {
 
   const placeholder = _.shuffle(categories).join(', ');
 
+  const popularPosts = await getPopularPosts();
+
   return {
     props: {
       data,
+      popularPosts,
       siteMetadata,
       placeholder,
     },
