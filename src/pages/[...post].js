@@ -1,5 +1,5 @@
 /** @jsx jsx */
-import { jsx, Container, Heading } from 'theme-ui';
+import { jsx, Container, Heading, Link } from 'theme-ui';
 import Head from 'next/head';
 import { gql, request } from 'graphql-request';
 
@@ -17,7 +17,21 @@ function Post({ data, siteMetadata }) {
         <meta name="description" content="Go now." key="description" />
       </Head>
       <Container>
-        <Heading sx={{ margin: '1rem', fontSize: 48 }}>{post.title}</Heading>
+        <Heading as="h1" sx={{ marginTop: '1rem', fontSize: 48 }}>
+          {post.title}
+        </Heading>
+        {post.originalUrl && post.originalUrl.url ? (
+          <p
+            sx={{
+              marginTop: '1rem',
+              fontSize: 48,
+              overflowWrap: 'break-word',
+              wordWrap: 'break-word',
+            }}
+          >
+            Original Source: <Link href={post.originalUrl.url}>{post.originalUrl.url}</Link>
+          </p>
+        ) : null}
         <div
           sx={{ fontSize: 24, img: { width: '100%' } }}
           dangerouslySetInnerHTML={{ __html: post.content }}

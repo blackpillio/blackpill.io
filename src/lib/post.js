@@ -52,6 +52,24 @@ const POST_BY_URI = gql`
             }
           }
         }
+        categories {
+          edges {
+            node {
+              name
+            }
+          }
+        }
+        originalUrl {
+          fieldGroupName
+          url
+        }
+        discordMeta {
+          fieldGroupName
+          authordescriminator
+          authorid
+          authorusername
+          createdtimestamp
+        }
       }
     }
   }

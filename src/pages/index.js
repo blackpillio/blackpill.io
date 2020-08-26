@@ -80,7 +80,6 @@ function renderSuggestion(suggestion) {
 }
 
 const IndexRoute = ({ siteMetadata, placeholder, popularPosts }) => {
-  console.log(popularPosts);
   const { WPGraphQL } = siteMetadata;
 
   const { colorMode } = useThemeUI();
@@ -125,9 +124,6 @@ const IndexRoute = ({ siteMetadata, placeholder, popularPosts }) => {
 
   const twoPosts = popularPosts.slice(0, 2);
   const rest = popularPosts.slice(3, popularPosts.length);
-
-  console.log(twoPosts);
-  console.log(rest);
 
   return (
     <Layout siteMetadata={siteMetadata}>
@@ -176,12 +172,12 @@ const IndexRoute = ({ siteMetadata, placeholder, popularPosts }) => {
         <Flex mb={3} sx={{ justifyContent: 'space-between' }}>
           {twoPosts.length
             ? twoPosts.map(({ node }) => (
-                <Box p={1}>
+                <Box key={node.uri} p={1}>
                   <Box p={2}>
                     <Heading>
-                      <Link href={node.uri}>
-                        <a>{node.title}</a>
-                      </Link>
+                      <NLink href={node.uri} passHref>
+                        <Link>{node.title}</Link>
+                      </NLink>
                     </Heading>
                     <p>
                       Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor
@@ -199,12 +195,10 @@ const IndexRoute = ({ siteMetadata, placeholder, popularPosts }) => {
         <Flex p={1} sx={{ flexDirection: 'column' }}>
           {rest.length
             ? rest.map(({ node }) => (
-                <Box sx={{ mb: '2rem' }}>
+                <Box key={node.uri} sx={{ mb: '2rem' }}>
                   <Heading>
                     <NLink href={node.uri} passHref>
-                      <Link>
-                        <a>{node.title}</a>
-                      </Link>
+                      <Link>{node.title}</Link>
                     </NLink>
                   </Heading>
                   <p>
