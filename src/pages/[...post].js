@@ -8,8 +8,25 @@ import { getSiteMetadata } from '../lib/site';
 
 import Layout from '../components/layout';
 
-function Post({ data, siteMetadata }) {
+function Post({ data, siteMetadata, params }) {
   const { post } = data;
+
+  if (!post) {
+    return (
+      <Layout siteMetadata={siteMetadata}>
+        <Head>
+          <title>Blackpill.io</title>
+          <meta name="description" content="Go now." key="description" />
+        </Head>
+        <Container>
+          <p>This page has gone missing...</p>
+          <p>Developer Information: </p>
+          <code>{JSON.stringify({ data, siteMetadata, params })}</code>
+        </Container>
+      </Layout>
+    );
+  }
+
   return (
     <Layout siteMetadata={siteMetadata}>
       <Head>
