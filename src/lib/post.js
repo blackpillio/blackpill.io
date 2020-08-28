@@ -58,12 +58,10 @@ const POST_BY_URI = gql`
             }
           }
         }
-        originalUrl {
-          fieldGroupName
-          url
+        sourceUrl {
+          sourceurl
         }
         discordMeta {
-          fieldGroupName
           authordescriminator
           authorid
           authorusername
