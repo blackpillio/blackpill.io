@@ -1,7 +1,6 @@
 import { gql, request } from 'graphql-request';
 
 import { getSiteMetadata } from './site';
-import { cachePostInfo } from '../utils/cache';
 
 const POSTS_AFTER = gql`
   query GET_POSTS($first: Int, $after: String) {
@@ -138,7 +137,6 @@ export const getPostPaths = async () => {
     finalNodes = await fetchPosts(firstEndCursor);
   }
 
-  cachePostInfo(finalNodes);
   return finalNodes.map(node => node.uri);
 };
 

@@ -20,7 +20,7 @@ function Post({ data, siteMetadata }) {
         <Heading as="h1" sx={{ marginTop: '1rem', fontSize: 48 }}>
           {post.title}
         </Heading>
-        {post.originalUrl && post.originalUrl.url ? (
+        {post.sourceUrl && post.sourceUrl.sourceurl ? (
           <p
             sx={{
               marginTop: '1rem',
@@ -29,7 +29,7 @@ function Post({ data, siteMetadata }) {
               wordWrap: 'break-word',
             }}
           >
-            Original Source: <Link href={post.originalUrl.url}>{post.originalUrl.url}</Link>
+            Original Source: <Link href={post.sourceUrl.sourceurl}>{post.sourceUrl.sourceurl}</Link>
           </p>
         ) : null}
         <div
